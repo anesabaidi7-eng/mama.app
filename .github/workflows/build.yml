@@ -19,14 +19,14 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.buildozer
-          key: ${{ runner.os }}-${{ hashFiles('buildozer.spec') }}-v1
+          key: ${{ runner.os }}-${{ hashFiles('buildozer.spec') }}-v2
           restore-keys: |
             ${{ runner.os }}-
             
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y git zip unzip openjdk-17-jdk autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev cmake libffi-dev libssl-dev expect
+          sudo apt-get install -y git zip unzip openjdk-17-jdk autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev cmake libffi-dev libssl-dev
           pip install --upgrade pip
           pip install buildozer cython==0.29.33
           
@@ -40,19 +40,20 @@ jobs:
           sed -i 's/^#source.main =.*/source.main = player.py/' buildozer.spec
           sed -i 's/^#requirements =.*/requirements = python3,kivy/' buildozer.spec
           
-      - name: Build with Buildozer
-        timeout-minutes: 25
+      - name: Accept Android SDK Licenses Manually
         run: |
-          expect -c '
-            set timeout -1
-            spawn buildozer -v android debug
-            expect {
-              -re ".*(A|a)ccept.*" { send "y\r"; exp_continue }
-              -re ".*(Y|y)/(N|n).*" { send "y\r"; exp_continue }
-              -re ".*\[y/N\].*" { send "y\r"; exp_continue }
-              eof
-            }
-          '
+          mkdir -p ~/.android
+          touch ~/.android/repositories.cfg
+          # Create Android SDK structure expected by Buildozer to avoid prompt freezes
+          mkdir -p /home/runner/.buildozer/android/platform/android-sdk/licenses
+          echo -e "\n24333f8a43b682527c704216a3a02a76fc826b24" > /home/runner/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
+          echo -e "\n84831b9409646a918e30573bab4c9c91346d8abd" >> /home/runner/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
+          echo -e "\nd975f75169877efb6ce42eefa134d17da31ef6c5" >> /home/runner/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
+
+      - name: Build with Buildozer
+        timeout-minutes: 30
+        run: |
+          buildozer -v android debug
           
       - name: Locate and Move APK
         run: |

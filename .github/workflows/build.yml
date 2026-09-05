@@ -46,10 +46,11 @@ jobs:
           expect -c '
             set timeout -1
             spawn buildozer -v android debug
-            interact {
-              -o "Do you want to accept SDK license" { send "y\r" }
-              -o "Accept?" { send "y\r" }
-              -o "y/N" { send "y\r" }
+            expect {
+              -re ".*(A|a)ccept.*" { send "y\r"; exp_continue }
+              -re ".*(Y|y)/(N|n).*" { send "y\r"; exp_continue }
+              -re ".*\[y/N\].*" { send "y\r"; exp_continue }
+              eof
             }
           '
           

@@ -25,6 +25,12 @@ jobs:
       - name: Initialize Buildozer
         run: |
           buildozer init
+          sed -i 's/# (str) Title of your application/title = Player App/' buildozer.spec
+          sed -i 's/# (str) Package name/package.name = player/' buildozer.spec
+          sed -i 's/# (str) Package domain/package.domain = org.player/' buildozer.spec
+          sed -i 's/# (list) Source files (relative to directory with buildozer.spec)/source.include_exts = py,png,jpg,kv,atlas\nsource.file_extensions = py,png,jpg,kv,atlas/' buildozer.spec
+          sed -i 's/# (str) Application requirements/requirements = python3,kivy/' buildozer.spec
+          sed -i 's/source.main = main.py/source.main = player.py/' buildozer.spec
           
       - name: Build with Buildozer
         run: |

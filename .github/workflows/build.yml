@@ -33,13 +33,14 @@ jobs:
           sed -i 's/^#requirements =.*/requirements = python3,kivy/' buildozer.spec
           
       - name: Build with Buildozer
+        timeout-minutes: 20
         run: |
           expect -c "
+            set timeout -1
             spawn buildozer -v android debug
             expect {
               -re \".*(A|a)ccept.*\" { send \"y\r\"; exp_continue }
               -re \".*(Y|y)/(N|n).*\" { send \"y\r\"; exp_continue }
-              timeout { exp_continue }
               eof
             }
           "

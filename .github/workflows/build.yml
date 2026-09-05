@@ -44,10 +44,11 @@ jobs:
             }
           "
           
-      - name: Move APK to bin
+      - name: Find and Move APK
         run: |
           mkdir -p bin
-          find . -name "*.apk" -exec cp {} bin/ \;
+          find . -name "*.apk" ! -path "./bin/*" -exec cp {} bin/ \;
+          ls -la bin/
           
       - name: Upload APK
         uses: actions/upload-artifact@v4

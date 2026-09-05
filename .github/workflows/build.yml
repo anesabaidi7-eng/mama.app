@@ -39,6 +39,7 @@ jobs:
             expect {
               -re \".*(A|a)ccept.*\" { send \"y\r\"; exp_continue }
               -re \".*(Y|y)/(N|n).*\" { send \"y\r\"; exp_continue }
+              timeout { exp_continue }
               eof
             }
           "
